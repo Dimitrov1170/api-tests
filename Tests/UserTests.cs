@@ -1,6 +1,8 @@
-﻿using NUnit.Framework;
-using RestSharp;
+﻿using Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using RestSharp;
 
 namespace Tests
 {
@@ -24,9 +26,13 @@ namespace Tests
             Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
 
             var json = JObject.Parse(response.Content);
-            var data = json["data"];
+            var dataArray = json["data"].ToString();
 
-            Assert.That(data.HasValues, Is.True, "No users returned");
+            var users = JsonConvert.DeserializeObject<List<User>>(dataArray);
+
+            Assert.That(users.Count, Is.GreaterThan(0));
+            Assert.That(users[0].Email, Is.Not.Null.And.Contains("@"));
+
         }
         [TearDown]
         public void TearDown() 
