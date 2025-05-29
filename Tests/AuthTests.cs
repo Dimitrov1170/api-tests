@@ -3,17 +3,18 @@ using RestSharp;
 using Newtonsoft.Json;
 using Models;
 using System.Threading.Tasks;
+using Clients;
 
 namespace Tests
 {
     public class AuthTests
     {
-        private RestClient client;
+        private UserClient userClient;
 
         [SetUp]
         public void Setup()
         {
-            client = new RestClient("https://reqres.in/");
+            userClient = new UserClient();
         }
 
         [Test]
@@ -25,11 +26,7 @@ namespace Tests
                 Password = "cityslicka"
             };
 
-            var request = new RestRequest("api/login", Method.Post);
-            request.AddJsonBody(loginRequest);
-            request.AddHeader("x-api-key", "reqres-free-v1");
-
-            var response = await client.ExecuteAsync(request);
+            var response = userClient.Login(loginRequest);
 
             var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(response.Content);
 
@@ -49,11 +46,7 @@ namespace Tests
                 Email = "eve.holt@reqres.in"
             };
 
-            var request = new RestRequest("api/login", Method.Post);
-            request.AddJsonBody(loginRequest);
-            request.AddHeader("x-api-key", "reqres-free-v1");
-
-            var response = await client.ExecuteAsync(request);
+            var response = userClient.Login(loginRequest);
 
             Assert.Multiple(() =>
             {
@@ -66,7 +59,7 @@ namespace Tests
         [TearDown]
         public void TearDown()
         {
-            client.Dispose();
+            userClient.Dispose();
         }
     }
 }

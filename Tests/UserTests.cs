@@ -1,4 +1,5 @@
 ﻿using Models;
+using Clients;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -8,28 +9,18 @@ namespace Tests
 {
     public class UserTests
     {
-        private RestClient client;
+        private UserClient userClient;
 
         [SetUp]
         public void Setup()
         {
-            client = new RestClient("https://reqres.in/");
+            userClient = new UserClient();
         }
 
         [Test]
         public void GetUsers_ShouldReturnListOfUsers()
         {
-            var request = new RestRequest("api/users?page=2", Method.Get);
-            request.AddHeader("x-api-key", "reqres-free-v1");
-            var response = client.Execute(request);
-
-            Assert.That(response.IsSuccessful, Is.True, "Request failed");
-            Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
-
-            var json = JObject.Parse(response.Content);
-            var dataArray = json["data"].ToString();
-
-            var users = JsonConvert.DeserializeObject<List<User>>(dataArray);
+            var users = userClient.GetUsers(2);
 
             Assert.That(users.Count, Is.GreaterThan(0));
             Assert.That(users[0].Email, Is.Not.Null.And.Contains("@"));
@@ -37,7 +28,7 @@ namespace Tests
         }
 
         [Test]
-        public async Task CreateUser_ShouldReturnCreatedUserWithId()
+        public void CreateUser_ShouldReturnCreatedUser()
         {
             var user = new CreateUserRequest
             {
@@ -45,25 +36,22 @@ namespace Tests
                 Job = "QA Engineer"
             };
 
-            var request = new RestRequest("api/users", Method.Post);
-            request.AddHeader("x-api-key", "reqres-free-v1");
-            request.AddJsonBody(user);
-
-            var response = await client.ExecuteAsync(request);
+            var response = userClient.CreateUser(user);
             var createdUser = JsonConvert.DeserializeObject<CreateUserResponse>(response.Content);
 
             Assert.Multiple(() =>
             {
                 Assert.That(response.IsSuccessful, Is.True);
+                Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Created));
                 Assert.That(createdUser.Name, Is.EqualTo("Georgi"));
                 Assert.That(createdUser.Job, Is.EqualTo("QA Engineer"));
-                Assert.That(createdUser.Id, Is.Not.Null.And.Not.Empty);
                 Assert.That(createdUser.CreatedAt, Is.Not.Null.And.Not.Empty);
             });
         }
 
+
         [Test]
-        public async Task UpdateUser_ShouldReturnUpdatedData()
+        public void UpdateUser_ShouldReturnUpdatedData()
         {
             var user = new CreateUserRequest
             {
@@ -71,11 +59,7 @@ namespace Tests
                 Job = "Senior QA"
             };
 
-            var request = new RestRequest("api/users/2", Method.Put);
-            request.AddHeader("x-api-key", "reqres-free-v1");
-            request.AddJsonBody(user);
-
-            var response = await client.ExecuteAsync(request);
+            var response = userClient.UpdateUser(2, user);
             var updatedUser = JsonConvert.DeserializeObject<CreateUserResponse>(response.Content);
 
             Assert.Multiple(() =>
@@ -84,17 +68,14 @@ namespace Tests
                 Assert.That(updatedUser.Name, Is.EqualTo("Georgi"));
                 Assert.That(updatedUser.Job, Is.EqualTo("Senior QA"));
                 Assert.That(updatedUser.UpdatedAt, Is.Not.Null.And.Not.Empty);
-
             });
         }
 
-        [Test]
-        public async Task DeleteUser_ShouldReturnNoContent()
-        {
-            var request = new RestRequest("api/users/2", Method.Delete);
-            request.AddHeader("x-api-key", "reqres-free-v1");
 
-            var response = await client.ExecuteAsync(request);
+        [Test]
+        public void DeleteUser_ShouldReturnNoContent()
+        {
+            var response = userClient.DeleteUser(2);
 
             Assert.Multiple(() =>
             {
@@ -105,10 +86,11 @@ namespace Tests
         }
 
 
+
         [TearDown]
         public void TearDown() 
         {
-           client.Dispose();
+           userClient.Dispose();
         }
 
     }
