@@ -20,6 +20,7 @@ namespace Tests
         public void GetUsers_ShouldReturnListOfUsers()
         {
             var request = new RestRequest("api/users?page=2", Method.Get);
+            request.AddHeader("x-api-key", "reqres-free-v1");
             var response = client.Execute(request);
 
             Assert.That(response.IsSuccessful, Is.True, "Request failed");
@@ -60,6 +61,49 @@ namespace Tests
                 Assert.That(createdUser.CreatedAt, Is.Not.Null.And.Not.Empty);
             });
         }
+
+        [Test]
+        public async Task UpdateUser_ShouldReturnUpdatedData()
+        {
+            var user = new CreateUserRequest
+            {
+                Name = "Georgi",
+                Job = "Senior QA"
+            };
+
+            var request = new RestRequest("api/users/2", Method.Put);
+            request.AddHeader("x-api-key", "reqres-free-v1");
+            request.AddJsonBody(user);
+
+            var response = await client.ExecuteAsync(request);
+            var updatedUser = JsonConvert.DeserializeObject<CreateUserResponse>(response.Content);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccessful, Is.True);
+                Assert.That(updatedUser.Name, Is.EqualTo("Georgi"));
+                Assert.That(updatedUser.Job, Is.EqualTo("Senior QA"));
+                Assert.That(updatedUser.UpdatedAt, Is.Not.Null.And.Not.Empty);
+
+            });
+        }
+
+        [Test]
+        public async Task DeleteUser_ShouldReturnNoContent()
+        {
+            var request = new RestRequest("api/users/2", Method.Delete);
+            request.AddHeader("x-api-key", "reqres-free-v1");
+
+            var response = await client.ExecuteAsync(request);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccessful, Is.True);
+                Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.NoContent));
+                Assert.That(response.Content, Is.Empty);
+            });
+        }
+
 
         [TearDown]
         public void TearDown() 
