@@ -34,6 +34,33 @@ namespace Tests
             Assert.That(users[0].Email, Is.Not.Null.And.Contains("@"));
 
         }
+
+        [Test]
+        public async Task CreateUser_ShouldReturnCreatedUserWithId()
+        {
+            var user = new CreateUserRequest
+            {
+                Name = "Georgi",
+                Job = "QA Engineer"
+            };
+
+            var request = new RestRequest("api/users", Method.Post);
+            request.AddHeader("x-api-key", "reqres-free-v1");
+            request.AddJsonBody(user);
+
+            var response = await client.ExecuteAsync(request);
+            var createdUser = JsonConvert.DeserializeObject<CreateUserResponse>(response.Content);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccessful, Is.True);
+                Assert.That(createdUser.Name, Is.EqualTo("Georgi"));
+                Assert.That(createdUser.Job, Is.EqualTo("QA Engineer"));
+                Assert.That(createdUser.Id, Is.Not.Null.And.Not.Empty);
+                Assert.That(createdUser.CreatedAt, Is.Not.Null.And.Not.Empty);
+            });
+        }
+
         [TearDown]
         public void TearDown() 
         {
