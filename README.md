@@ -36,30 +36,9 @@ This project is a beginner-friendly API automation suite built using C#, NUnit, 
 
 ---
 
-📦 Project Structure
-
-api-test/
-│
-├── Clients/
-│   └── UserClient.cs        # Handles all API interactions
-│
-├── Models/
-│   ├── LoginRequest.cs
-│   ├── LoginResponse.cs
-│   ├── CreateUserRequest.cs
-│   ├── CreateUserResponse.cs
-│   └── User.cs              # For GET /users parsing
-│
-├── Tests/
-│   ├── AuthTests.cs         # Login tests
-│   └── UserTests.cs         # User CRUD tests
-
----
-
 👤 Author
-Georgi Dimitrov
-QA Automation Engineer
-GitHub Profile
+**Georgi Dimitrov**
+**QA Automation Engineer**
 
 ---
 
