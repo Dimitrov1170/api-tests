@@ -1,6 +1,6 @@
 # Reqres API Automation Tests
 
-This project is a beginner-friendly API automation suite built using C#, NUnit, and RestSharp. It tests the public [Reqres API](https://reqres.in/) and demonstrates clean, maintainable structure for junior QA engineering roles.
+This project is a beginner-friendly API automation suite built using C#, NUnit, and RestSharp. It tests the public [Reqres API](https://reqres.in/) and demonstrates clean, maintainable structure.
 
 ## 📌 Tech Stack
 
